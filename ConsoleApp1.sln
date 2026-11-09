@@ -1,25 +1,525 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.37502.11 d17.14
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{E5F6F9C4-2834-4FD8-BF27-F19C9CB1BCB0}"
-EndProject
-Global
-	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E5F6F9C4-2834-4FD8-BF27-F19C9CB1BCB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E5F6F9C4-2834-4FD8-BF27-F19C9CB1BCB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E5F6F9C4-2834-4FD8-BF27-F19C9CB1BCB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E5F6F9C4-2834-4FD8-BF27-F19C9CB1BCB0}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {28ED7425-58C1-4A64-A0CC-921F0413A080}
-	EndGlobalSection
-EndGlobal
+using System;
+
+using System.Globalization;
+
+
+
+namespace Laboratorio_evalución
+
+{
+
+    internal class Program
+
+    {
+
+        public const int TOTAL_ORDENES = 6;
+
+
+
+        public static string[] codigos =
+
+        {
+
+      "OC-101", "OC-102", "OC-103",
+
+      "OC-104", "OC-105", "OC-106"
+
+    };
+
+
+
+        public static string[] proveedores =
+
+        {
+
+      "TechCorp1",
+
+      "LogiExpress",
+
+      "InsumosGlobal",
+
+      "TechCorp2",
+
+      "AlfaSuministros",
+
+      "ServiRedes"
+
+    };
+
+
+
+
+
+        public static double[,] datos =
+
+        {
+
+      { 150.0, 10.0 },
+
+      { 450.0, 2.0 },
+
+      { 80.0, 50.0 },
+
+      { 1200.0, 1.0 },
+
+      { 25.0, 100.0 },
+
+      { 600.0, 3.0 }
+
+    };
+
+
+
+        public static double granTotal;
+
+        public static int comprasMayores;
+
+
+
+        static void Main(string[] args)
+
+        {
+
+            bool salir = false;
+
+
+
+            while (!salir)
+
+            {
+
+                Console.Clear();
+
+                MostrarTitulo();
+
+
+
+                Console.WriteLine("1. Mostrar reporte ordenado");
+
+                Console.WriteLine("2. Mostrar métricas");
+
+                Console.WriteLine("3. Buscar orden");
+
+                Console.WriteLine("4. Salir");
+
+                Console.Write("Seleccione una opción: ");
+
+
+
+                int opcion;
+
+
+
+                int.TryParse(Console.ReadLine(), out opcion);
+
+
+
+                switch (opcion)
+
+                {
+
+                    case 1:
+
+                        ordenamiento_directo();
+
+                        MostrarReporte();
+
+                        Console.ReadKey();
+
+                        break;
+
+
+
+                    case 2:
+
+                        CalcularMetricas();
+
+                        MostrarMetricas();
+
+                        Console.ReadKey();
+
+                        break;
+
+
+
+                    case 3:
+
+                        Console.Write("\nIngrese el código a buscar: ");
+
+                        string codigo = Console.ReadLine();
+
+                        Busqueda(codigo);
+
+                        Console.ReadKey();
+
+                        break;
+
+
+
+                    case 4:
+
+                        salir = true;
+
+                        break;
+
+
+
+                    default:
+
+                        Console.WriteLine("Error: opción inválida.");
+
+                        Console.ReadKey();
+
+                        break;
+
+                }
+
+            }
+
+        }
+
+
+
+        public static void MostrarTitulo()
+
+        {
+
+            Console.WriteLine("============================================================");
+
+            Console.WriteLine("    CONTROL DE ÓRDENES DE COMPRA (EVALUACIÓN 45 MIN)");
+
+            Console.WriteLine("============================================================");
+
+        }
+
+
+
+        public static bool validar_datos(double precio, double cantidad)
+
+        {
+
+            if (precio <= 0 || cantidad <= 0)
+
+            {
+
+                Console.WriteLine("Alerta: el precio y la cantidad deben ser mayores que cero.");
+
+                return false;
+
+            }
+
+
+
+            return true;
+
+        }
+
+
+
+        public static double CalcularMonto(double precio, double cantidad)
+
+        {
+
+            if (!validar_datos(precio, cantidad))
+
+            {
+
+                return 0;
+
+            }
+
+
+
+            return precio * cantidad;
+
+        }
+
+
+
+        public static void CalcularMetricas()
+
+        {
+
+            granTotal = 0;
+
+            comprasMayores = 0;
+
+
+
+            for (int i = 0; i < TOTAL_ORDENES; i++)
+
+            {
+
+                double precio = datos[i, 0];
+
+                double cantidad = datos[i, 1];
+
+                double montoNeto = CalcularMonto(precio, cantidad);
+
+
+
+                granTotal += montoNeto;
+
+
+
+                if (montoNeto > 1000)
+
+                {
+
+                    comprasMayores++;
+
+                }
+
+            }
+
+        }
+
+
+
+        public static void ordenamiento_directo()
+
+        {
+
+            bool intercambio;
+
+
+
+            for (int pasada = 0; pasada < TOTAL_ORDENES - 1; pasada++)
+
+            {
+
+                intercambio = false;
+
+
+
+                for (int i = 0; i < TOTAL_ORDENES - pasada - 1; i++)
+
+                {
+
+                    double montoActual = CalcularMonto(datos[i, 0], datos[i, 1]);
+
+                    double montoSiguiente =
+
+                      CalcularMonto(datos[i + 1, 0], datos[i + 1, 1]);
+
+
+
+                    if (montoActual < montoSiguiente)
+
+                    {
+
+                        IntercambiarFilas(i, i + 1);
+
+
+
+                        string codigoTemporal = codigos[i];
+
+                        codigos[i] = codigos[i + 1];
+
+                        codigos[i + 1] = codigoTemporal;
+
+
+
+                        string proveedorTemporal = proveedores[i];
+
+                        proveedores[i] = proveedores[i + 1];
+
+                        proveedores[i + 1] = proveedorTemporal;
+
+
+
+                        intercambio = true;
+
+                    }
+
+                }
+
+
+
+                if (!intercambio)
+
+                {
+
+                    break;
+
+                }
+
+            }
+
+        }
+
+
+
+        private static void IntercambiarFilas(int filaUno, int filaDos)
+
+        {
+
+            double precioTemporal = datos[filaUno, 0];
+
+            datos[filaUno, 0] = datos[filaDos, 0];
+
+            datos[filaDos, 0] = precioTemporal;
+
+
+
+            double cantidadTemporal = datos[filaUno, 1];
+
+            datos[filaUno, 1] = datos[filaDos, 1];
+
+            datos[filaDos, 1] = cantidadTemporal;
+
+        }
+
+
+
+        private static void MostrarReporte()
+
+        {
+
+            Console.Clear();
+
+            MostrarTitulo();
+
+
+
+            Console.WriteLine();
+
+            Console.WriteLine("--- REPORTE ORDENADO POR MONTO NETO (DECRECIENTE) ---");
+
+
+
+            for (int i = 0; i < TOTAL_ORDENES; i++)
+
+            {
+
+                double montoNeto = CalcularMonto(datos[i, 0], datos[i, 1]);
+
+
+
+                Console.WriteLine(
+
+                  "{0}. Código: {1} | Prov: {2,-16} | Monto: $ {3}",
+
+                  i + 1,
+
+                  codigos[i],
+
+                  proveedores[i],
+
+                  FormatearMonto(montoNeto));
+
+            }
+
+        }
+
+
+
+        private static void MostrarMetricas()
+
+        {
+
+            CalcularMetricas();
+
+
+
+            Console.Clear();
+
+            MostrarTitulo();
+
+
+
+            Console.WriteLine();
+
+            Console.WriteLine("------------------------------------------------------------");
+
+            Console.WriteLine("MÉTRICAS RESUMEN:");
+
+            Console.WriteLine(
+
+              " * Gran Total Acumulado   : $ {0}",
+
+              FormatearMonto(granTotal));
+
+            Console.WriteLine(
+
+              " * Compras Críticas (> $1,000): {0} órdenes",
+
+              comprasMayores);
+
+        }
+
+
+
+        public static void Busqueda(string codigoBuscado)
+
+        {
+
+            if (string.IsNullOrWhiteSpace(codigoBuscado))
+
+            {
+
+                Console.WriteLine("Error: el código no puede estar vacío.");
+
+                return;
+
+            }
+
+
+
+            codigoBuscado = codigoBuscado.Trim();
+
+
+
+            for (int i = 0; i < TOTAL_ORDENES; i++)
+
+            {
+
+                if (codigos[i].Equals(
+
+                  codigoBuscado,
+
+                  StringComparison.OrdinalIgnoreCase))
+
+                {
+
+                    double montoNeto = CalcularMonto(datos[i, 0], datos[i, 1]);
+
+
+
+                    Console.WriteLine(
+
+                      "¡ENCONTRADO! Proveedor: {0} | Monto: ${1}",
+
+                      proveedores[i],
+
+                      FormatearMonto(montoNeto));
+
+
+
+                    return;
+
+                }
+
+            }
+
+
+
+            Console.WriteLine("Error: el código no existe.");
+
+        }
+
+
+
+        private static string FormatearMonto(double monto)
+
+        {
+
+            return monto.ToString("N2", CultureInfo.InvariantCulture);
+
+        }
+
+
+
+    }
+
+}
